@@ -141,7 +141,7 @@ class Kiwoom(QAxWidget):
             total_earning_rate = float(total_earning_rate) / 100
             total_earning_rate = str(total_earning_rate)
 
-        self._opw00018_output['single'].append(total_earning_rate)
+        self.opw00018_output['single'].append(total_earning_rate)
 
         estimated_deposit = self._comm_get_data(trcode, "", rqname, 0, "추정예탁자산")
 
@@ -165,7 +165,7 @@ class Kiwoom(QAxWidget):
             purchase_price = Kiwoom.change_format(purchase_price)
             current_price = Kiwoom.change_format(current_price)
             eval_profit_loss_price = Kiwoom.change_format(eval_profit_loss_price)
-            earning_rate = Kiwoom.change_format2(earning_rate)
+            earning_rate = Kiwoom.change_format_float(earning_rate)
     
             self.opw00018_output['multi'].append([name, quantity, purchase_price, current_price,              
     eval_profit_loss_price, earning_rate])
