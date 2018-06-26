@@ -1,0 +1,19 @@
+import pandas as pd
+from pandas import DataFrame, Series
+from datetime import datetime
+from pandas_datareader import data
+import fix_yahoo_finance as yf # 야후 파이낸스에서 데이터 읽기 위해 import
+ 
+# 야후 파인낸스 import 해서 크롤링하기 위해서 아래 명령어 입력해 설치
+# 아나콘다 프롬프트에서 > pip install pandas-datareader 해서 설치
+# 아나콘다 프롬프트에서 > pip install fix_yahoo_finance --upgrade --no-cache-dir 해서 설치
+ 
+yf.pdr_override() # 야후 파이낸스에서 크롤링
+ 
+start = datetime(2017, 1, 1) # 시작일
+#end = datetime(2018, 4, 30) # 종료일
+end = datetime.today() # 현재 날짜를 종료일
+ 
+yahoo_data = data.get_data_yahoo('035420.KS', start, end)
+frame = DataFrame(yahoo_data) # 데이터프레임으로 변경
+print(frame.tail())
