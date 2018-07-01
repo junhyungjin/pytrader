@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>842</width>
-    <height>419</height>
+    <height>625</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>48-48-f30c250e4cb9558ba7356ba7fc88a241-chart.png</normaloff>48-48-f30c250e4cb9558ba7356ba7fc88a241-chart.png</iconset>
+    <normaloff>../Users/scott/.designer/backup/48-48-f30c250e4cb9558ba7356ba7fc88a241-chart.png</normaloff>../Users/scott/.designer/backup/48-48-f30c250e4cb9558ba7356ba7fc88a241-chart.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="groupBox">
@@ -281,7 +281,7 @@
      </column>
      <column>
       <property name="text">
-       <string>새 행</string>
+       <string>총수익률(%)</string>
       </property>
      </column>
      <column>
@@ -355,6 +355,59 @@
      <property name="text">
       <string>실시간 조회</string>
      </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_3">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>380</y>
+      <width>631</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>자동 선정 종목 리스트</string>
+    </property>
+    <widget class="QTableWidget" name="tableWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>611</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <column>
+      <property name="text">
+       <string>주문유형</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>종목명</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>호가구분</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>수량</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>가격</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>상태</string>
+      </property>
+     </column>
     </widget>
    </widget>
   </widget>

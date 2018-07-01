@@ -13,6 +13,7 @@ class Kiwoom(QAxWidget):
         super().__init__()
         self._create_kiwoom_instance()
         self._set_signal_slots()
+        
 
     def _create_kiwoom_instance(self):
         self.setControl("KHOPENAPI.KHOpenAPICtrl.1")
@@ -136,19 +137,12 @@ class Kiwoom(QAxWidget):
         total_eval_price = self._comm_get_data(trcode, "", rqname, 0, "총평가금액")
         total_eval_profit_loss_price = self._comm_get_data(trcode, "", rqname, 0, "총평가손익금액")
         total_earning_rate = self._comm_get_data(trcode, "", rqname, 0, "총수익률(%)")
-        total_earning_rate = Kiwoom.change_format_float(total_earning_rate)
-        if self.get_server_gubun():
-            total_earning_rate = float(total_earning_rate) / 100
-            total_earning_rate = str(total_earning_rate)
-
-        self.opw00018_output['single'].append(total_earning_rate)
-
         estimated_deposit = self._comm_get_data(trcode, "", rqname, 0, "추정예탁자산")
-
+    
         self.opw00018_output['single'].append(Kiwoom.change_format(total_purchase_price))
         self.opw00018_output['single'].append(Kiwoom.change_format(total_eval_price))
         self.opw00018_output['single'].append(Kiwoom.change_format(total_eval_profit_loss_price))
-        #self.opw00018_output['single'].append(Kiwoom.change_format(total_earning_rate))
+        self.opw00018_output['single'].append(Kiwoom.change_format_float(total_earning_rate))
         self.opw00018_output['single'].append(Kiwoom.change_format(estimated_deposit))
 
         # multi data
@@ -169,6 +163,7 @@ class Kiwoom(QAxWidget):
     
             self.opw00018_output['multi'].append([name, quantity, purchase_price, current_price,              
     eval_profit_loss_price, earning_rate])
+
 
 
 
@@ -207,5 +202,6 @@ if __name__ == "__main__":
     account_number = kiwoom.get_login_info("ACCNO")
     account_number = account_number.split(';')[0]
 
+    kiwoom.reset_opw00018_output()
     kiwoom.set_input_value("계좌번호", account_number)
     kiwoom.comm_rq_data("opw00018_req", "opw00018", 0, "2000")
