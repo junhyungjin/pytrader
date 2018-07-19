@@ -39,23 +39,6 @@ def get_financial_statements(code):
     df = df.set_index('주요재무정보')
     return df
     
-def get_estimated_dividend_yield(code):
-    df = get_financial_statements(code)
-    dividend_yield = df.ix["현금배당수익률"]
-    
-    now = datetime.datetime.now()
-    cur_year = now.year
-    
-    if str(cur_year) in dividend_yield.index:
-        cur_year_dividend_yield = dividend_yield[str(cur_year)]
-        if np.isnan(cur_year_dividend_yield):
-            return dividend_yield[str(cur_year-1)]
-        else:
-            return cur_year_dividend_yield
-    else:
-        return dividend_yield[str(cur_year-1)]
-    
-    
 def get_3year_treasury():
     url = "http://www.index.go.kr/strata/jsp/showStblGams3.jsp?stts_cd=288401&amp;idx_cd=2884&amp;freq=Y&amp;period=1998:2017"
     html = requests.get(url).text
@@ -73,7 +56,7 @@ def get_3year_treasury():
     
     #print(treasury_3year)
     return treasury_3year
-       
+
 def get_dividend_yield(code):
     url = "http://companyinfo.stock.naver.com/company/c1010001.aspx?cmp_cd=" + code
     html = requests.get(url).text
@@ -87,6 +70,23 @@ def get_dividend_yield(code):
     dividend_yield = dividend_yield[:-1]
     
     return dividend_yield
+
+def get_estimated_dividend_yield(code):
+    df = get_financial_statements(code)
+    dividend_yield = df.ix["현금배당수익률"]
+    
+    now = datetime.datetime.now()
+    cur_year = now.year
+    
+    for temp_year in dividend_yield.index:
+        if str(cur_year) in temp_year:
+            cur_year_dividend_yield = dividend_yield[str(temp_year)]
+            if np.isnan(cur_year_dividend_yield):
+                return dividend_yield[str(cur_year-1)]
+            else:
+                return cur_year_dividend_yield
+    else:
+        return dividend_yield[str(cur_year-1)]
     
 def get_current_3year_treasury():
     url = "http://info.finance.naver.com/marketindex/interestDailyQuote.nhn?marketindexCd=IRR_GOVT03Y&page=1"
