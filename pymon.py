@@ -6,6 +6,13 @@ import webreader
 import numpy as np
 
 class PyMon:
+    
+    def __init__(self):
+        df = pd.read_html('http://kind.krx.co.kr/corpgeneral/corpList.do?method=download&searchType=13', header=0)[0]
+        df.종목코드 = df.종목코드.map('{:06d}'.format)
+        kospi_codes = df[["회사명","종목코드"]]
+        
+        
     def update_buy_list(self, buy_list):
         f = open("buy_list.txt", "wt")
         for code in buy_list:
@@ -25,8 +32,12 @@ class PyMon:
 
 def calculate_estimated_dividend_to_treasury(self, code):
     estimated_dividend_yield = webreader.get_estimated_dividend_yield(code)
+    
     if np.isnan(estimated_dividend_yield):
         estimated_dividend_yield = webreader.get_dividend_yield(code)
+        
+        if estimated_dividend_yield == "":
+            estimated_dividend_yield = 0
 
     current_3year_treasury = webreader.get_current_3year_treasury()
     estimated_dividend_to_treasury = float(estimated_dividend_yield) / float(current_3year_treasury)
