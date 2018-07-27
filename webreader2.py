@@ -78,15 +78,12 @@ def get_estimated_dividend_yield(code):
     now = datetime.datetime.now()
     cur_year = now.year
     
-    for temp_year in dividend_yield.index:
-        if str(cur_year) in temp_year:
-            cur_year_dividend_yield = dividend_yield[str(temp_year)]
-            if np.isnan(cur_year_dividend_yield):
-                return dividend_yield[str(cur_year-1)]
-            else:
-                return cur_year_dividend_yield
-    else:
+    if str(cur_year) in dividend_yield.index and not np.isnan(dividend_yield[str(cur_year)]):
+        return dividend_yield[str(cur_year)]
+    elif str(cur_year-1) in dividend_yield.index and not np.isnan(dividend_yield[str(cur_year-1)]):
         return dividend_yield[str(cur_year-1)]
+    else:
+        return np.NaN
     
 def get_current_3year_treasury():
     url = "http://info.finance.naver.com/marketindex/interestDailyQuote.nhn?marketindexCd=IRR_GOVT03Y&page=1"
@@ -138,7 +135,7 @@ def get_min_max_dividend_to_treasury(code):
             ratio = float(previous_dividend_yield[year]) / float(three_years_treasury[year])
             previous_dividend_to_treasury[year] = ratio
     
-    #print(previous_dividend_to_treasury)
+    print(previous_dividend_to_treasury)
     min_ratio = min(previous_dividend_to_treasury.values())
     max_ratio = max(previous_dividend_to_treasury.values())
 
@@ -170,27 +167,16 @@ def run_dividend():
     buy_list = []
 
     for row in kospi_codes.itertuples():
-        time.sleep(0.5)
         ret = buy_check_by_dividend_algorithm(row[2])
         
         if ret[0] == 1:
+            print("Buy: " + row[2] + ":" + row[1] + " " + str(ret[1]))
+            print("---------------------------------------------------")
             buy_list.append((row[2], ret[1]))
         else:
+            print("Don't Buy: " + row[2] + ":" + row[1])
+            print("---------------------------------------------------")
             pass
         
     sorted_list = sorted(buy_list, key=lambda t:t[1], reverse=True)
     print(sorted_list)
-        
-def get_estimated_dividend_yield(code):
-    df = get_financial_statements(code)
-    dividend_yield = df.ix["현금배당수익률"]
-    
-    now = datetime.datetime.now()
-    cur_year = now.year
-    
-    if str(cur_year) in dividend_yield.index and not np.isnan(dividend_yield[str(cur_year)]):
-        return dividend_yield[str(cur_year)]
-    elif str(cur_year-1) in dividend_yield.index and not np.isnan(dividend_yield[str(cur_year-1)]):
-        return dividend_yield[str(cur_year-1)]
-    else:
-        return np.NaN

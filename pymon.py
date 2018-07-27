@@ -18,17 +18,18 @@ class PyMon:
         for code in buy_list:
             f.writelines("매수;", code, ";시장가;10;0;매수전")
         f.close()
-
-    def run(self):
+    
+    def run_dividend(self):
         buy_list = []
-        num = len(self.kosdaq_codes)
 
-        for i, code in enumerate(self.kosdaq_codes):
-            print(i, '/', num)
-            if self.check_speedy_rising_volume(code):
-                buy_list.append(code)
+        for row in self.kospi_codes.itertuples():
+            ret = self.buy_check_by_dividend_algorithm(row[2])
 
-        self.update_buy_list(buy_list)
+            if ret[0] == 1:
+                print("Pass "+ row[2] + ":" + row[1], ret)
+                buy_list.append((row[2], ret[1]))
+            else:
+                pass
 
 def calculate_estimated_dividend_to_treasury(self, code):
     estimated_dividend_yield = webreader.get_estimated_dividend_yield(code)
@@ -46,6 +47,7 @@ def calculate_estimated_dividend_to_treasury(self, code):
 def get_min_max_dividend_to_treasury(self, code):
     previous_dividend_yield = webreader.get_previous_dividend_yield(code)
     three_years_treasury = webreader.get_3year_treasury()
+    
     now = datetime.datetime.now()
     cur_year = now.year
     previous_dividend_to_treasury = {}
