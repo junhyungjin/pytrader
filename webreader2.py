@@ -59,6 +59,10 @@ def get_dividend_yield(code):
     
     soup = BeautifulSoup(html, 'lxml')
     td_data = soup.find_all('td', {'class': 'cmp-table-cell td0301'})
+    
+    if not td_data:
+        return ""
+    
     dt_data = td_data[0].find_all('dt')
     
     dividend_yield = dt_data[5].text
@@ -134,7 +138,7 @@ def get_min_max_dividend_to_treasury(code):
             ratio = float(previous_dividend_yield[year]) / float(three_years_treasury[year])
             previous_dividend_to_treasury[year] = ratio
     
-    print(previous_dividend_to_treasury)
+    #print(previous_dividend_to_treasury)
     min_ratio = min(previous_dividend_to_treasury.values())
     max_ratio = max(previous_dividend_to_treasury.values())
 
@@ -144,7 +148,7 @@ def buy_check_by_dividend_algorithm(code):
     estimated_dividend_to_treasury = calculate_estimated_dividend_to_treasury(code)
     (min_ratio, max_ratio) = get_min_max_dividend_to_treasury(code)
 
-    if estimated_dividend_to_treasury >= max_ratio:
+    if estimated_dividend_to_treasury >= max_ratio and max_ratio != 0:
         return (1, estimated_dividend_to_treasury)
     else:
         return (0, estimated_dividend_to_treasury)
@@ -166,10 +170,27 @@ def run_dividend():
     buy_list = []
 
     for row in kospi_codes.itertuples():
+        time.sleep(0.5)
         ret = buy_check_by_dividend_algorithm(row[2])
         
         if ret[0] == 1:
-            print("Pass "+ row[2] + ":" + row[1], ret)
             buy_list.append((row[2], ret[1]))
         else:
             pass
+        
+    sorted_list = sorted(buy_list, key=lambda t:t[1], reverse=True)
+    print(sorted_list)
+        
+def get_estimated_dividend_yield(code):
+    df = get_financial_statements(code)
+    dividend_yield = df.ix["현금배당수익률"]
+    
+    now = datetime.datetime.now()
+    cur_year = now.year
+    
+    if str(cur_year) in dividend_yield.index and not np.isnan(dividend_yield[str(cur_year)]):
+        return dividend_yield[str(cur_year)]
+    elif str(cur_year-1) in dividend_yield.index and not np.isnan(dividend_yield[str(cur_year-1)]):
+        return dividend_yield[str(cur_year-1)]
+    else:
+        return np.NaN

@@ -63,6 +63,10 @@ def get_dividend_yield(code):
     
     soup = BeautifulSoup(html, 'lxml')
     td_data = soup.find_all('td', {'class': 'cmp-table-cell td0301'})
+    
+    if not td_data:
+        return ""
+    
     dt_data = td_data[0].find_all('dt')
     
     dividend_yield = dt_data[5].text
@@ -78,15 +82,29 @@ def get_estimated_dividend_yield(code):
     now = datetime.datetime.now()
     cur_year = now.year
     
-    for temp_year in dividend_yield.index:
-        if str(cur_year) in temp_year:
-            cur_year_dividend_yield = dividend_yield[str(temp_year)]
-            if np.isnan(cur_year_dividend_yield):
-                return dividend_yield[str(cur_year-1)]
-            else:
-                return cur_year_dividend_yield
-    else:
+    if str(cur_year) in dividend_yield.index and not np.isnan(dividend_yield[str(cur_year)]):
+        return dividend_yield[str(cur_year)]
+    elif str(cur_year-1) in dividend_yield.index and not np.isnan(dividend_yield[str(cur_year-1)]):
         return dividend_yield[str(cur_year-1)]
+    else:
+        return np.NaN
+    
+#def get_estimated_dividend_yield(code):
+#    df = get_financial_statements(code)
+#    dividend_yield = df.ix["현금배당수익률"]
+#    
+#    now = datetime.datetime.now()
+#    cur_year = now.year
+#    
+#    for temp_year in dividend_yield.index:
+#        if str(cur_year) in temp_year:
+#            cur_year_dividend_yield = dividend_yield[str(temp_year)]
+#            if np.isnan(cur_year_dividend_yield):
+#                return dividend_yield[str(cur_year-1)]
+#            else:
+#                return cur_year_dividend_yield
+#    else:
+#        return dividend_yield[str(cur_year-1)]
     
 def get_current_3year_treasury():
     url = "http://info.finance.naver.com/marketindex/interestDailyQuote.nhn?marketindexCd=IRR_GOVT03Y&page=1"
