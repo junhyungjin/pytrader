@@ -136,11 +136,14 @@ def get_min_max_dividend_to_treasury(code):
             previous_dividend_to_treasury[year] = ratio
     
     print(previous_dividend_to_treasury)
-    min_ratio = min(previous_dividend_to_treasury.values())
-    max_ratio = max(previous_dividend_to_treasury.values())
+    if previous_dividend_to_treasury:
+        min_ratio = min(previous_dividend_to_treasury.values())
+        max_ratio = max(previous_dividend_to_treasury.values())
+    else:
+        min_ratio = 0
+        max_ratio = 0
 
     return (min_ratio, max_ratio)
-
 def buy_check_by_dividend_algorithm(code):
     estimated_dividend_to_treasury = calculate_estimated_dividend_to_treasury(code)
     (min_ratio, max_ratio) = get_min_max_dividend_to_treasury(code)
@@ -165,18 +168,25 @@ def update_buy_list(buy_list):
     
 def run_dividend():
     buy_list = []
+    top_five = []
 
+    
     for row in kospi_codes.itertuples():
         ret = buy_check_by_dividend_algorithm(row[2])
         
         if ret[0] == 1:
             print("Buy: " + row[2] + ":" + row[1] + " " + str(ret[1]))
             print("---------------------------------------------------")
-            buy_list.append((row[2], ret[1]))
+            buy_list.append((row[2], row[1], ret[1]))
         else:
-            print("Don't Buy: " + row[2] + ":" + row[1])
+            print("Don't Buy: " + row[2] + ":" + row[1] + " " str(ret[1])
             print("---------------------------------------------------")
             pass
-        
+    
     sorted_list = sorted(buy_list, key=lambda t:t[1], reverse=True)
-    print(sorted_list)
+    
+    for i in range(0,5):
+        code = sorted_list[i][0]
+        top_five.append(code)
+                  
+    self.update_buy_list(top_five)
