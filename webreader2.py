@@ -164,12 +164,12 @@ def update_buy_list(buy_list):
     f.close()
     
 def run_dividend():
-    
     kospi_codes = get_kospi_codes()
     buy_list = []
     top_five = []
     
     for row in kospi_codes.itertuples():
+        print(row[2]+":"+row[1])
         ret = buy_check_by_dividend_algorithm(row[2])
         
         if ret[0] == 1:
