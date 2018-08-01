@@ -1,3 +1,6 @@
+#-*-coding:utf-8
+
+import re
 import sys
 import time
 from pandas import DataFrame
@@ -7,34 +10,28 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 
+def get_date_str(s):
+    date_str = ''
+    r = re.search("\d{4}", s)
+    if r:
+        date_str = r.group()
+
+    return date_str
+
 def get_financial_statements(code):
     url = "http://companyinfo.stock.naver.com/v1/company/ajax/cF1001.aspx?cmp_cd=%s&fin_typ=0&freq_typ=Y" % (code)
-    html = requests.get(url).text
-
-    html = html.replace('<th class="bg r01c02 endLine line-bottom"colspan="8">연간</th>', "")
-    html = html.replace("<span class='span-sub'>(IFRS연결)</span>", "")
-    html = html.replace("<span class='span-sub'>(IFRS별도)</span>", "")
-    html = html.replace("<span class='span-sub'>(GAAP개별)</span>", "")
-    html = html.replace('\t', '')
-    html = html.replace('\n', '')
-    html = html.replace('\r', '')
-
-    for year in range(2009, 2018):
-        for month in range(6, 13):
-            month = "/%02d" % month
-            html = html.replace(str(year) + month, str(year))
-
-        for month in range(1, 6):
-            month = "/%02d" % month
-            html = html.replace(str(year+1) + month, str(year))
-
-        html = html.replace(str(year) + '(E)', str(year))
-
-    df_list = pd.read_html(html)
+    
+    df_list = pd.read_html(url, encoding="utf-8")
     df = df_list[0]
     df = df.set_index('주요재무정보')
-    return df
+    cols = list(df.columns)
+    cols.remove('연간')
+    cols = [get_date_str(x) for x in cols]
+    df = df.ix[:, :-1]
+    df.columns = cols
     
+    return df
+
 def get_3year_treasury():
     url = "http://www.index.go.kr/strata/jsp/showStblGams3.jsp?stts_cd=288401&amp;idx_cd=2884&amp;freq=Y&amp;period=1998:2017"
     html = requests.get(url).text
@@ -167,9 +164,10 @@ def update_buy_list(buy_list):
     f.close()
     
 def run_dividend():
+    
+    kospi_codes = get_kospi_codes()
     buy_list = []
     top_five = []
-
     
     for row in kospi_codes.itertuples():
         ret = buy_check_by_dividend_algorithm(row[2])
@@ -179,7 +177,7 @@ def run_dividend():
             print("---------------------------------------------------")
             buy_list.append((row[2], row[1], ret[1]))
         else:
-            print("Don't Buy: " + row[2] + ":" + row[1] + " " str(ret[1])
+            print("Don't Buy: " + row[2] + ":" + row[1] + " " + str(ret[1]))
             print("---------------------------------------------------")
             pass
     
@@ -189,4 +187,8 @@ def run_dividend():
         code = sorted_list[i][0]
         top_five.append(code)
                   
-    self.update_buy_list(top_five)
+    print(top_five)
+    update_buy_list(top_five)
+                  
+if __name__ == "__main__":
+    run_dividend()
